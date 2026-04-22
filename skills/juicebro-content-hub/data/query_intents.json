@@ -1,0 +1,230 @@
+{
+  "$schema": "../../schemas/query_intents.schema.json",
+  "_comment": "查询意图定义，Agent 根据用户输入匹配意图并路由到对应处理逻辑",
+  "intents": [
+    {
+      "id": "all_platform_query",
+      "label": "全平台总查",
+      "description": "遍历所有可查询平台，汇总指定时间范围内的更新",
+      "trigger_patterns": [
+        "果汁哥今天发了什么",
+        "果汁哥今天更新了什么",
+        "果汁哥今天有什么新内容",
+        "果汁哥最近发了什么",
+        "果汁哥最近三天发了什么",
+        "果汁哥最近一周发了什么",
+        "果汁哥最近七天更新了什么",
+        "果汁哥最近哪个平台最活跃",
+        "果汁哥各平台发帖频率怎么样",
+        "果汁哥最近在哪些平台发布了内容"
+      ],
+      "required_params": ["time_range"],
+      "optional_params": ["output_format"],
+      "default_params": {
+        "time_range": "last_3_days",
+        "output_format": "by_platform_list",
+        "platforms": "all_queryable"
+      },
+      "prompt_template": "prompts/summarize_recent_posts.md",
+      "output_format_options": ["list", "by_platform_list", "digest", "report"],
+      "notes": "时间范围未指定时默认 last_3_days；平台不过滤，遍历所有 is_queryable=true 的平台"
+    },
+    {
+      "id": "platform_single_query",
+      "label": "平台单查",
+      "description": "查询用户指定的单个或多个平台，不遍历其他平台",
+      "trigger_patterns": [
+        "果汁哥今天微博发了什么",
+        "果汁哥微博最近发了什么",
+        "果汁哥今天小红书发了什么",
+        "果汁哥今天抖音发了什么",
+        "果汁哥今天 B 站更了什么",
+        "果汁哥最近雪球发了什么",
+        "果汁哥最近头条发了什么",
+        "果汁哥最近公众号更了什么",
+        "果汁哥最近小宇宙更新了什么"
+      ],
+      "required_params": ["platform_id", "time_range"],
+      "optional_params": ["topic", "content_type", "output_format"],
+      "default_params": {
+        "time_range": "last_7_days",
+        "output_format": "list"
+      },
+      "platform_keywords": {
+        "weibo": ["微博", "weibo"],
+        "xiaohongshu": ["小红书", "红书", "xiaohongshu", "rednote"],
+        "douyin": ["抖音", "douyin"],
+        "kuaishou": ["快手", "kuaishou"],
+        "bilibili": ["B站", "bilibili", "哔哩哔哩", "b站"],
+        "xueqiu": ["雪球", "xueqiu"],
+        "toutiao": ["头条", "今日头条", "toutiao"],
+        "wechat_oa": ["公众号", "微信公众号", "公号"],
+        "yuanbao": ["元宝", "yuanbao"],
+        "ximalaya": ["喜马拉雅", "喜马", "ximalaya"],
+        "xiaoyuzhou": ["小宇宙", "xiaoyuzhou"],
+        "zhishixingqiu": ["知识星球", "星球", "planet"]
+      },
+      "prompt_template": "prompts/summarize_by_platform.md",
+      "notes": "若平台 is_queryable=false，直接输出限制说明，不调用其他逻辑"
+    },
+    {
+      "id": "topic_query",
+      "label": "主题查询",
+      "description": "跨平台或指定平台过滤特定主题的内容",
+      "trigger_patterns": [
+        "果汁哥最近关于比特币发了什么",
+        "果汁哥最近有什么比特币相关内容",
+        "果汁哥最近关于黄金发了什么",
+        "果汁哥最近关于美股发了什么",
+        "果汁哥最近关于 AI 发了什么",
+        "果汁哥最近关于特朗普发了什么",
+        "果汁哥关于宏观经济有什么看法",
+        "果汁哥有哪些关于投资策略的内容"
+      ],
+      "required_params": ["topic"],
+      "optional_params": ["platform_id", "time_range", "output_format"],
+      "default_params": {
+        "time_range": "last_7_days",
+        "platforms": "all_queryable",
+        "output_format": "topic_list"
+      },
+      "topic_detection": "参照 data/topic_keywords.json 进行关键词匹配",
+      "prompt_template": "prompts/summarize_by_topic.md",
+      "notes": "主题查询优先在高价值平台（雪球、头条、公众号）查找，其次全平台"
+    },
+    {
+      "id": "content_type_query",
+      "label": "内容形态查询",
+      "description": "按内容类型过滤（视频/文章/音频/短帖/图文）",
+      "trigger_patterns": [
+        "果汁哥最近有哪些视频",
+        "果汁哥最近发了哪些视频",
+        "果汁哥最近有哪些文章",
+        "果汁哥最近有哪些音频",
+        "果汁哥最近有哪些播客",
+        "果汁哥最近有哪些短帖",
+        "果汁哥最近发了哪些图文"
+      ],
+      "required_params": ["content_type"],
+      "optional_params": ["platform_id", "time_range", "topic", "output_format"],
+      "default_params": {
+        "time_range": "last_7_days",
+        "output_format": "list"
+      },
+      "content_type_keywords": {
+        "video": ["视频", "短视频", "长视频", "video"],
+        "article": ["文章", "长文", "推文", "article"],
+        "audio": ["音频", "播客", "podcast", "节目", "audio"],
+        "short_post": ["短帖", "微博", "动态", "说说", "短内容"],
+        "image_post": ["图文", "笔记", "图片", "小红书笔记"]
+      },
+      "content_type_platforms": {
+        "video": ["douyin", "kuaishou", "bilibili"],
+        "article": ["toutiao", "wechat_oa", "bilibili"],
+        "audio": ["ximalaya", "xiaoyuzhou"],
+        "short_post": ["weibo", "xueqiu", "yuanbao"],
+        "image_post": ["xiaohongshu"]
+      },
+      "prompt_template": "prompts/summarize_recent_posts.md",
+      "notes": "根据 content_type 自动过滤到对应平台，减少无效查询"
+    },
+    {
+      "id": "aggregation_report",
+      "label": "汇总报告",
+      "description": "生成日报、周报或按维度整理的结构化报告",
+      "trigger_patterns": [
+        "把果汁哥最近一周内容按平台整理一下",
+        "把果汁哥最近三天投资内容单独摘出来",
+        "把果汁哥今天更新内容做成日报",
+        "生成果汁哥今日内容日报",
+        "帮我做一份果汁哥今天的内容摘要",
+        "果汁哥本周有哪些重要内容",
+        "给我果汁哥最近一周的内容概览"
+      ],
+      "required_params": ["report_type"],
+      "optional_params": ["time_range", "platform_id", "topic", "content_type"],
+      "report_types": {
+        "daily_digest": {
+          "label": "日报",
+          "trigger_keywords": ["日报", "今天", "今日"],
+          "default_time_range": "today",
+          "default_grouping": "by_platform"
+        },
+        "weekly_by_platform": {
+          "label": "周报（按平台）",
+          "trigger_keywords": ["一周", "七天", "本周", "上周", "按平台"],
+          "default_time_range": "last_7_days",
+          "default_grouping": "by_platform"
+        },
+        "weekly_highlights": {
+          "label": "周报（精选）",
+          "trigger_keywords": ["重要", "精选", "亮点", "highlights"],
+          "default_time_range": "last_7_days",
+          "default_grouping": "by_relevance"
+        },
+        "recent_by_topic": {
+          "label": "主题摘要",
+          "trigger_keywords": ["投资", "主题", "专题", "摘出来"],
+          "default_time_range": "last_3_days",
+          "default_grouping": "by_topic"
+        }
+      },
+      "prompt_template": "prompts/summarize_by_platform.md",
+      "notes": "日报使用 today 时间范围；周报使用 last_7_days；均按平台分组后统计总条数"
+    },
+    {
+      "id": "navigation_recommend",
+      "label": "导航推荐",
+      "description": "根据用户内容需求推荐最合适的平台",
+      "trigger_patterns": [
+        "看投资内容去哪个平台",
+        "看日常分享去哪个平台",
+        "听播客去哪个平台",
+        "果汁哥在哪里发视频",
+        "果汁哥哪个平台更新最频繁",
+        "关注果汁哥应该首选哪个平台"
+      ],
+      "required_params": [],
+      "optional_params": ["content_preference", "platform_query"],
+      "navigation_map": {
+        "investment": {
+          "primary": ["xueqiu", "wechat_oa", "toutiao"],
+          "reason": "雪球以投资分析见长，公众号和头条发布深度文章"
+        },
+        "daily": {
+          "primary": ["weibo", "xiaohongshu"],
+          "reason": "微博更新频率高，小红书图文内容丰富"
+        },
+        "video": {
+          "primary": ["bilibili", "douyin"],
+          "reason": "B站适合中长视频，抖音适合短视频"
+        },
+        "podcast": {
+          "primary": ["xiaoyuzhou", "ximalaya"],
+          "reason": "小宇宙为主要播客平台，喜马拉雅同步更新"
+        },
+        "most_active": {
+          "primary": ["weibo"],
+          "reason": "微博更新频率通常最高，发帖最勤"
+        }
+      },
+      "prompt_template": "prompts/fallback_response.md",
+      "notes": "不需要实时访问，直接基于 accounts.json 和 platform_rules.json 回答"
+    },
+    {
+      "id": "unknown",
+      "label": "未识别意图",
+      "description": "无法匹配任何已知意图，返回友好说明",
+      "trigger_patterns": [],
+      "prompt_template": "prompts/fallback_response.md",
+      "notes": "提示用户参考 supported-queries.md 中的查询示例"
+    }
+  ],
+  "time_range_keywords": {
+    "today": ["今天", "今日", "当天", "今儿"],
+    "last_3_days": ["最近", "近三天", "三天", "最近几天", "这几天"],
+    "last_7_days": ["一周", "七天", "上周", "最近一周", "最近七天", "本周"],
+    "last_30_days": ["一个月", "近一月", "本月", "最近一个月"],
+    "this_month": ["本月", "这个月"]
+  }
+}

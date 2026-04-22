@@ -1,0 +1,285 @@
+{
+  "$schema": "../../schemas/platform_rules.schema.json",
+  "_comment": "各平台查询规则和字段可用性配置",
+  "_last_updated": "2024-01-01",
+  "rules": {
+    "weibo": {
+      "platform_id": "weibo",
+      "access_method": "web_public",
+      "query_strategy": "profile_timeline",
+      "today_query": "按发布时间筛选当日内容，微博显示发帖时间（相对时间或绝对时间）",
+      "search_url_pattern": "https://weibo.com/u/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": false,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "image_urls": true,
+        "video_url": true,
+        "repost_count": true,
+        "like_count": true,
+        "comment_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "若访问失败，提示用户直接访问 weibo.com 并搜索账号",
+      "dedup_note": "微博内容通常唯一，但可能同时发布到快手/抖音，需跨平台去重"
+    },
+    "wechat_private": {
+      "platform_id": "wechat_private",
+      "access_method": "none",
+      "query_strategy": "not_queryable",
+      "today_query": "不适用，个人微信无法公开查询",
+      "search_url_pattern": null,
+      "available_fields": {},
+      "rate_limit": "none",
+      "login_required": true,
+      "partial_login_required": true,
+      "failure_handling": "直接说明：个人微信账号无法公开查询，该平台不在可查范围内",
+      "dedup_note": "不适用"
+    },
+    "yuanbao": {
+      "platform_id": "yuanbao",
+      "access_method": "web_public",
+      "query_strategy": "profile_page",
+      "today_query": "访问元宝用户主页，检查最近更新时间",
+      "search_url_pattern": "https://yuanbao.tencent.com/",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true
+      },
+      "rate_limit": "unknown",
+      "login_required": false,
+      "partial_login_required": true,
+      "failure_handling": "元宝平台为新兴平台，若访问受限，提示用户直接访问腾讯元宝 App",
+      "dedup_note": "元宝内容可能与公众号内容重叠"
+    },
+    "xiaohongshu": {
+      "platform_id": "xiaohongshu",
+      "access_method": "web_public",
+      "query_strategy": "profile_notes",
+      "today_query": "访问用户主页笔记列表，按时间筛选当日发布",
+      "search_url_pattern": "https://www.xiaohongshu.com/user/profile/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "image_urls": true,
+        "like_count": true,
+        "collect_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": true,
+      "failure_handling": "小红书部分内容需登录查看完整内容，若受限，提示用户在 App 内搜索 guozhige",
+      "dedup_note": "图文内容可能同步到微博，标题相似时需去重"
+    },
+    "douyin": {
+      "platform_id": "douyin",
+      "access_method": "web_public",
+      "query_strategy": "profile_videos",
+      "today_query": "访问用户主页视频列表，检查最近视频发布时间",
+      "search_url_pattern": "https://www.douyin.com/user/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": false,
+        "content_type": true,
+        "source_locator": true,
+        "view_count": true,
+        "like_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "抖音访问受限时，提示用户在抖音 App 搜索'果汁哥的知识分享'",
+      "dedup_note": "视频内容高度可能同步到快手和B站，需跨平台去重（标题+时长相似）"
+    },
+    "kuaishou": {
+      "platform_id": "kuaishou",
+      "access_method": "web_public",
+      "query_strategy": "profile_videos",
+      "today_query": "访问快手用户主页，检查视频发布时间",
+      "search_url_pattern": "https://www.kuaishou.com/profile/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": false,
+        "content_type": true,
+        "source_locator": true,
+        "view_count": true,
+        "like_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "快手访问受限时，提示用户在快手 App 搜索'果汁哥'",
+      "dedup_note": "与抖音内容高度重叠，查询时自动标注 also_posted_on"
+    },
+    "bilibili": {
+      "platform_id": "bilibili",
+      "access_method": "web_public_and_api",
+      "query_strategy": "space_videos_and_articles",
+      "today_query": "使用 B 站用户空间接口获取最近投稿，按时间筛选",
+      "search_url_pattern": "https://space.bilibili.com/{uid}",
+      "api_available": true,
+      "api_note": "B 站有公开 API，可获取用户视频列表和专栏文章，无需认证（有 rate limit）",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "view_count": true,
+        "like_count": true,
+        "duration": true,
+        "thumbnail_url": true
+      },
+      "rate_limit": "low",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "B 站有稳定公开接口，失败概率低；若失败，直接访问 space.bilibili.com",
+      "dedup_note": "视频可能同步自抖音/快手，标题相同时合并，标注 also_posted_on"
+    },
+    "xueqiu": {
+      "platform_id": "xueqiu",
+      "access_method": "web_public",
+      "query_strategy": "user_timeline",
+      "today_query": "访问雪球用户页面，获取时间线，筛选当日内容",
+      "search_url_pattern": "https://xueqiu.com/u/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": false,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "like_count": true,
+        "comment_count": true,
+        "repost_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "雪球公开内容可访问，若失败提示用户访问 xueqiu.com/u/juicebro",
+      "dedup_note": "雪球内容通常为独家投资分析，与其他平台重叠少"
+    },
+    "zhishixingqiu": {
+      "platform_id": "zhishixingqiu",
+      "access_method": "none",
+      "query_strategy": "not_queryable",
+      "today_query": "不适用，知识星球内容需付费订阅",
+      "search_url_pattern": null,
+      "available_fields": {},
+      "rate_limit": "none",
+      "login_required": true,
+      "partial_login_required": true,
+      "failure_handling": "直接说明：知识星球为付费社区，内容不可公开查询；如需访问请加入星球",
+      "dedup_note": "不适用"
+    },
+    "toutiao": {
+      "platform_id": "toutiao",
+      "access_method": "web_public",
+      "query_strategy": "author_articles",
+      "today_query": "访问今日头条作者主页，获取文章列表，按时间筛选",
+      "search_url_pattern": "https://www.toutiao.com/c/user/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "view_count": true,
+        "like_count": true
+      },
+      "rate_limit": "moderate",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "今日头条部分内容需登录，若受限提示用户在头条 App 搜索'果汁哥的知识分享'",
+      "dedup_note": "文章可能同步自公众号，标题相同时合并"
+    },
+    "wechat_oa": {
+      "platform_id": "wechat_oa",
+      "access_method": "web_partial",
+      "query_strategy": "sogou_weixin_search",
+      "today_query": "通过搜狗微信搜索或直接访问公众号文章链接，按时间筛选",
+      "search_url_pattern": "https://weixin.sogou.com/weixin?type=1&query={account_name}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true
+      },
+      "rate_limit": "high",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "公众号文章可通过搜狗搜索找到摘要；完整内容可能需要微信环境访问；提示用户在微信内关注并查看",
+      "dedup_note": "文章可能同时发布到头条，标题相同时合并"
+    },
+    "ximalaya": {
+      "platform_id": "ximalaya",
+      "access_method": "web_public",
+      "query_strategy": "anchor_albums",
+      "today_query": "访问喜马拉雅主播主页，查看最近节目更新时间",
+      "search_url_pattern": "https://www.ximalaya.com/zhubo/{account_id}",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "play_count": true,
+        "duration": true,
+        "episode_number": true
+      },
+      "rate_limit": "low",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "喜马拉雅公开内容稳定可访问，若失败提示用户在 App 搜索'果汁哥juicebro'",
+      "dedup_note": "音频内容与小宇宙高度重叠，需跨平台去重（标题+时长匹配）"
+    },
+    "xiaoyuzhou": {
+      "platform_id": "xiaoyuzhou",
+      "access_method": "web_public_and_rss",
+      "query_strategy": "podcast_episodes",
+      "today_query": "访问小宇宙播客主页或 RSS Feed，获取最新节目列表",
+      "search_url_pattern": "https://www.xiaoyuzhoufm.com/podcast/{podcast_id}",
+      "rss_available": true,
+      "rss_note": "小宇宙支持 RSS 订阅，可获取节目列表和元数据",
+      "available_fields": {
+        "publish_time": true,
+        "title": true,
+        "summary": true,
+        "content_type": true,
+        "source_locator": true,
+        "duration": true,
+        "episode_number": true
+      },
+      "rate_limit": "low",
+      "login_required": false,
+      "partial_login_required": false,
+      "failure_handling": "小宇宙 RSS 稳定可用，若 Web 访问受限可尝试 RSS 方式；提示用户在小宇宙 App 搜索'果汁哥'",
+      "dedup_note": "与喜马拉雅内容高度重叠，需按标题+时长去重"
+    }
+  },
+  "queryable_platforms": [
+    "weibo", "yuanbao", "xiaohongshu", "douyin", "kuaishou",
+    "bilibili", "xueqiu", "toutiao", "wechat_oa", "ximalaya", "xiaoyuzhou"
+  ],
+  "non_queryable_platforms": ["wechat_private", "zhishixingqiu"],
+  "default_time_ranges": {
+    "today": "当日（00:00 - 现在）",
+    "last_3_days": "最近 3 天",
+    "last_7_days": "最近 7 天",
+    "last_30_days": "最近 30 天",
+    "this_week": "本周一至今",
+    "this_month": "本月 1 日至今"
+  }
+}

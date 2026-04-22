@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Juicebro-star/juicebro-content-hub/schemas/normalized_result.schema.json",
+  "title": "NormalizedResult",
+  "description": "Skill 查询的最终输出结构，包含查询元数据、各平台状态、规范化内容列表和汇总统计。",
+  "type": "object",
+  "required": [
+    "query_meta",
+    "platform_statuses",
+    "posts",
+    "summary_stats"
+  ],
+  "properties": {
+    "query_meta": {
+      "type": "object",
+      "description": "本次查询的元数据",
+      "required": ["intent_type", "time_range", "queried_at"],
+      "properties": {
+        "intent_type": {
+          "type": "string",
+          "description": "识别到的意图类型",
+          "enum": [
+            "all_platform_query",
+            "platform_single_query",
+            "topic_query",
+            "content_type_query",
+            "aggregation_report",
+            "navigation_recommend",
+            "unknown"
+          ]
+        },
+        "time_range": {
+          "type": "string",
+          "description": "查询时间范围标识",
+          "enum": ["today", "last_3_days", "last_7_days", "last_30_days", "this_week", "this_month"]
+        },
+        "time_range_label": {
+          "type": "string",
+          "description": "时间范围的可读标签",
+          "examples": ["今天", "最近3天", "最近一周"]
+        },
+        "platforms_requested": {
+          "type": "array",
+          "description": "本次查询请求的平台列表（若为全平台，则为所有 is_queryable=true 的平台）",
+          "items": { "type": "string" }
+        },
+        "topic_filter": {
+          "type": ["string", "null"],
+          "description": "主题过滤条件（topic_id），无过滤时为 null"
+        },
+        "content_type_filter": {
+          "type": ["string", "null"],
+          "description": "内容类型过滤条件，无过滤时为 null",
+          "enum": ["video", "article", "audio", "short_post", "image_post", null]
+        },
+        "queried_at": {
+          "type": "string",
+          "description": "查询执行时间，ISO8601 格式",
+          "format": "date-time"
+        },
+        "skill_version": {
+          "type": "string",
+          "description": "执行本次查询的 Skill 版本",
+          "examples": ["0.1.0"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "platform_statuses": {
+      "type": "object",
+      "description": "各平台的查询状态",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "posts_count"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "平台查询状态",
+            "enum": [
+              "accessible",
+              "login_required",
+              "paid_only",
+              "unreachable",
+              "skipped",
+              "not_applicable"
+            ]
+          },
+          "posts_count": {
+            "type": "integer",
+            "description": "从该平台获取到的内容条数",
+            "minimum": 0
+          },
+          "error_message": {
+            "type": ["string", "null"],
+            "description": "若状态非 accessible，说明受限/失败原因"
+          },
+          "last_checked": {
+            "type": ["string", "null"],
+            "description": "本次查询访问该平台的时间",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "weibo": { "status": "accessible", "posts_count": 3, "error_message": null, "last_checked": "2024-01-15T12:00:00+08:00" },
+          "zhishixingqiu": { "status": "paid_only", "posts_count": 0, "error_message": "知识星球为付费社区，内容不可公开查询", "last_checked": null }
+        }
+      ]
+    },
+    "posts": {
+      "type": "array",
+      "description": "规范化内容列表，已完成跨平台去重",
+      "items": {
+        "$ref": "normalized_post.schema.json"
+      }
+    },
+    "summary_stats": {
+      "type": "object",
+      "description": "本次查询的汇总统计",
+      "required": ["total_posts", "accessible_platforms", "restricted_platforms"],
+      "properties": {
+        "total_posts": {
+          "type": "integer",
+          "description": "去重后的内容总条数",
+          "minimum": 0
+        },
+        "pre_dedup_count": {
+          "type": "integer",
+          "description": "去重前的原始条数",
+          "minimum": 0
+        },
+        "dedup_removed": {
+          "type": "integer",
+          "description": "去重移除的条数",
+          "minimum": 0
+        },
+        "accessible_platforms": {
+          "type": "array",
+          "description": "本次成功访问的平台列表",
+          "items": { "type": "string" }
+        },
+        "restricted_platforms": {
+          "type": "array",
+          "description": "本次访问受限的平台列表",
+          "items": { "type": "string" }
+        },
+        "posts_by_platform": {
+          "type": "object",
+          "description": "各平台内容条数",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "posts_by_content_type": {
+          "type": "object",
+          "description": "各内容类型条数",
+          "properties": {
+            "video": { "type": "integer", "minimum": 0 },
+            "article": { "type": "integer", "minimum": 0 },
+            "audio": { "type": "integer", "minimum": 0 },
+            "short_post": { "type": "integer", "minimum": 0 },
+            "image_post": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "posts_by_topic": {
+          "type": "object",
+          "description": "各主题标签内容条数（一条内容可计入多个主题）",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "most_active_platform": {
+          "type": ["string", "null"],
+          "description": "本次查询时间范围内更新最多的平台"
+        },
+        "latest_post_time": {
+          "type": ["string", "null"],
+          "description": "所有内容中最新的发布时间",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "output_format": {
+      "type": "string",
+      "description": "建议的输出格式",
+      "enum": ["list", "by_platform_list", "digest", "report", "topic_list", "navigation"],
+      "default": "by_platform_list"
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "query_meta": {
+        "intent_type": "all_platform_query",
+        "time_range": "today",
+        "time_range_label": "今天",
+        "platforms_requested": ["weibo", "xiaohongshu", "bilibili", "xueqiu"],
+        "topic_filter": null,
+        "content_type_filter": null,
+        "queried_at": "2024-01-15T12:30:00+08:00",
+        "skill_version": "0.1.0"
+      },
+      "platform_statuses": {
+        "weibo": { "status": "accessible", "posts_count": 3, "error_message": null, "last_checked": "2024-01-15T12:30:00+08:00" },
+        "bilibili": { "status": "accessible", "posts_count": 1, "error_message": null, "last_checked": "2024-01-15T12:30:00+08:00" },
+        "xueqiu": { "status": "accessible", "posts_count": 2, "error_message": null, "last_checked": "2024-01-15T12:30:00+08:00" },
+        "zhishixingqiu": { "status": "paid_only", "posts_count": 0, "error_message": "知识星球为付费社区，不在公开查询范围内", "last_checked": null }
+      },
+      "posts": [],
+      "summary_stats": {
+        "total_posts": 6,
+        "pre_dedup_count": 7,
+        "dedup_removed": 1,
+        "accessible_platforms": ["weibo", "bilibili", "xueqiu"],
+        "restricted_platforms": ["zhishixingqiu"],
+        "posts_by_platform": { "weibo": 3, "bilibili": 1, "xueqiu": 2 },
+        "posts_by_content_type": {
+          "video": 1, "article": 0, "audio": 0, "short_post": 5, "image_post": 0
+        },
+        "posts_by_topic": { "bitcoin": 2, "macro": 1, "us_stock": 1 },
+        "most_active_platform": "weibo",
+        "latest_post_time": "2024-01-15T10:30:00+08:00"
+      },
+      "output_format": "by_platform_list"
+    }
+  ]
+}

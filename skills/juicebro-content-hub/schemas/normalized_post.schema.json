@@ -1,0 +1,290 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Juicebro-star/juicebro-content-hub/schemas/normalized_post.schema.json",
+  "title": "NormalizedPost",
+  "description": "果汁哥内容聚合 Skill 的标准化内容单元。所有平台的内容都规范化为此格式后再进行汇总和去重。",
+  "type": "object",
+  "required": [
+    "platform",
+    "account",
+    "publish_time",
+    "summary",
+    "content_type",
+    "topic_tags",
+    "source_locator"
+  ],
+  "properties": {
+    "platform": {
+      "type": "string",
+      "description": "平台唯一标识符",
+      "enum": [
+        "weibo",
+        "wechat_private",
+        "yuanbao",
+        "xiaohongshu",
+        "douyin",
+        "kuaishou",
+        "bilibili",
+        "xueqiu",
+        "zhishixingqiu",
+        "toutiao",
+        "wechat_oa",
+        "ximalaya",
+        "xiaoyuzhou"
+      ],
+      "examples": ["weibo", "bilibili", "xueqiu"]
+    },
+    "account": {
+      "type": "string",
+      "description": "平台账号名（对应 accounts.json 中的 account_name）",
+      "minLength": 1,
+      "examples": ["果汁哥6688", "juicebro", "果汁哥juicebro"]
+    },
+    "publish_time": {
+      "type": ["string", "null"],
+      "description": "发布时间，ISO8601 格式，北京时间（UTC+8）。若无法确定则为 null。",
+      "format": "date-time",
+      "examples": ["2024-01-15T10:30:00+08:00", "2024-01-14T20:00:00+08:00"]
+    },
+    "title": {
+      "type": ["string", "null"],
+      "description": "内容标题。长文、视频、播客通常有标题；短帖无标题时为 null。",
+      "maxLength": 300,
+      "examples": ["【深度分析】美联储会降息吗？", null]
+    },
+    "summary": {
+      "type": "string",
+      "description": "内容摘要，不超过 150 字。直接提取自内容，不得主观添加。",
+      "minLength": 1,
+      "maxLength": 500,
+      "examples": ["今天聊聊比特币的走势，感觉市场情绪有些过热，需要注意风险控制..."]
+    },
+    "content_type": {
+      "type": "string",
+      "description": "内容形态枚举",
+      "enum": ["video", "article", "audio", "short_post", "image_post"],
+      "enumDescriptions": {
+        "video": "视频（短视频或长视频）",
+        "article": "文章（长文，通常有标题，超过 500 字）",
+        "audio": "音频（播客节目）",
+        "short_post": "短帖（短文字动态，微博/雪球动态等）",
+        "image_post": "图文（以图片为主体，附文字说明）"
+      }
+    },
+    "topic_tags": {
+      "type": "array",
+      "description": "主题标签列表，对应 topic_keywords.json 中的 topic_id。可为空数组。",
+      "items": {
+        "type": "string",
+        "enum": [
+          "bitcoin",
+          "gold",
+          "us_stock",
+          "a_stock",
+          "ai",
+          "trump",
+          "macro",
+          "crypto",
+          "real_estate",
+          "investment_strategy",
+          "tech_stock",
+          "finance",
+          "commodities",
+          "geopolitics"
+        ]
+      },
+      "uniqueItems": true,
+      "examples": [["bitcoin", "crypto"], ["us_stock", "macro"], []]
+    },
+    "source_locator": {
+      "type": ["string", "null"],
+      "description": "内容的直接访问 URL 或定位信息。无法确定时为 null。",
+      "examples": [
+        "https://weibo.com/7123456789/N0jK1Ab",
+        "https://www.bilibili.com/video/BV1xx411c7mD",
+        "https://xueqiu.com/1234567890/123456789"
+      ]
+    },
+    "raw_content": {
+      "type": ["string", "null"],
+      "description": "原始内容文本（可选）。用于 Agent 进行进一步语义分析。超过 2000 字时截断。",
+      "maxLength": 2000
+    },
+    "dedupe_hash": {
+      "type": ["string", "null"],
+      "description": "跨平台去重指纹，基于标题+摘要前200字的 MD5 值（16位十六进制）。",
+      "pattern": "^[0-9a-f]{16}$",
+      "examples": ["a3f2c1d8e4b5f790"]
+    },
+    "also_posted_on": {
+      "type": "array",
+      "description": "若此内容在其他平台也有发布，列出其他平台的 platform_id。",
+      "items": {
+        "type": "string",
+        "enum": [
+          "weibo", "wechat_private", "yuanbao", "xiaohongshu",
+          "douyin", "kuaishou", "bilibili", "xueqiu", "zhishixingqiu",
+          "toutiao", "wechat_oa", "ximalaya", "xiaoyuzhou"
+        ]
+      },
+      "uniqueItems": true,
+      "examples": [["kuaishou"], ["toutiao", "wechat_oa"], []]
+    },
+    "media": {
+      "type": "object",
+      "description": "媒体附加信息（视频/音频/图片特有字段）",
+      "properties": {
+        "duration_seconds": {
+          "type": ["integer", "null"],
+          "description": "视频/音频时长（秒）",
+          "minimum": 0,
+          "examples": [1800, 3600]
+        },
+        "duration_display": {
+          "type": ["string", "null"],
+          "description": "时长的可读格式",
+          "examples": ["30:00", "1:00:00"]
+        },
+        "thumbnail_url": {
+          "type": ["string", "null"],
+          "description": "封面图 URL",
+          "format": "uri"
+        },
+        "episode_number": {
+          "type": ["integer", "null"],
+          "description": "播客节目期数（仅 audio 类型有意义）",
+          "minimum": 1
+        },
+        "image_count": {
+          "type": ["integer", "null"],
+          "description": "图文中图片数量（仅 image_post 有意义）",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "engagement": {
+      "type": "object",
+      "description": "互动数据（各平台可用性不同，可为 null）",
+      "properties": {
+        "view_count": {
+          "type": ["integer", "null"],
+          "description": "播放量/阅读量",
+          "minimum": 0
+        },
+        "like_count": {
+          "type": ["integer", "null"],
+          "description": "点赞数",
+          "minimum": 0
+        },
+        "comment_count": {
+          "type": ["integer", "null"],
+          "description": "评论数",
+          "minimum": 0
+        },
+        "collect_count": {
+          "type": ["integer", "null"],
+          "description": "收藏数（小红书等平台）",
+          "minimum": 0
+        },
+        "repost_count": {
+          "type": ["integer", "null"],
+          "description": "转发数",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "extraction_notes": {
+      "type": "string",
+      "description": "字段提取过程的备注，记录疑难点、缺失说明、受限情况等。正常情况下为空字符串。",
+      "default": "",
+      "examples": [
+        "",
+        "publish_time 由相对时间'2小时前'推算，基准时间 2024-01-15T12:00:00+08:00",
+        "内容被折叠，仅提取可见部分，实际内容可能更完整"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "platform": "weibo",
+      "account": "果汁哥6688",
+      "publish_time": "2024-01-15T10:30:00+08:00",
+      "title": null,
+      "summary": "今天比特币突破 10 万美元，市场情绪高涨，但我觉得需要冷静看待...",
+      "content_type": "short_post",
+      "topic_tags": ["bitcoin", "crypto"],
+      "source_locator": "https://weibo.com/7123456789/N0jK1Ab",
+      "raw_content": "今天比特币突破 10 万美元，市场情绪高涨，但我觉得需要冷静看待...",
+      "dedupe_hash": "a3f2c1d8e4b5f790",
+      "also_posted_on": [],
+      "media": null,
+      "engagement": {
+        "view_count": null,
+        "like_count": 1250,
+        "comment_count": 88,
+        "collect_count": null,
+        "repost_count": 34
+      },
+      "extraction_notes": ""
+    },
+    {
+      "platform": "bilibili",
+      "account": "果汁哥juicebro",
+      "publish_time": "2024-01-14T20:00:00+08:00",
+      "title": "【深度分析】美联储2024年降息路径预测",
+      "summary": "本期视频从就业数据、通胀指标和美联储历史决策模式三个维度，深度分析2024年降息的时间节点和幅度预测。",
+      "content_type": "video",
+      "topic_tags": ["us_stock", "macro"],
+      "source_locator": "https://www.bilibili.com/video/BV1xx411c7mD",
+      "raw_content": null,
+      "dedupe_hash": "b5c3d2e9f1a6g801",
+      "also_posted_on": ["douyin"],
+      "media": {
+        "duration_seconds": 2340,
+        "duration_display": "39:00",
+        "thumbnail_url": "https://i2.hdslb.com/bfs/archive/xxx.jpg",
+        "episode_number": null,
+        "image_count": null
+      },
+      "engagement": {
+        "view_count": 45678,
+        "like_count": 3201,
+        "comment_count": 432,
+        "collect_count": null,
+        "repost_count": null
+      },
+      "extraction_notes": ""
+    },
+    {
+      "platform": "xiaoyuzhou",
+      "account": "果汁哥",
+      "publish_time": "2024-01-14T18:00:00+08:00",
+      "title": "第42期：和朋友聊了聊黄金配置逻辑",
+      "summary": "本期邀请朋友聊了聊黄金在投资组合中的定位，以及当前市场环境下的配置建议。",
+      "content_type": "audio",
+      "topic_tags": ["gold", "investment_strategy"],
+      "source_locator": "https://www.xiaoyuzhoufm.com/episode/abc123def456",
+      "raw_content": null,
+      "dedupe_hash": "c6d4e3f0g2b7h912",
+      "also_posted_on": ["ximalaya"],
+      "media": {
+        "duration_seconds": 3240,
+        "duration_display": "54:00",
+        "thumbnail_url": null,
+        "episode_number": 42,
+        "image_count": null
+      },
+      "engagement": {
+        "view_count": null,
+        "like_count": null,
+        "comment_count": null,
+        "collect_count": null,
+        "repost_count": null
+      },
+      "extraction_notes": ""
+    }
+  ]
+}

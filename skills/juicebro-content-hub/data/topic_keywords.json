@@ -1,0 +1,140 @@
+{
+  "$schema": "../../schemas/topic_keywords.schema.json",
+  "_comment": "主题关键词映射表，用于内容主题标注和过滤查询",
+  "_last_updated": "2024-01-01",
+  "topics": {
+    "bitcoin": {
+      "label": "比特币",
+      "label_en": "Bitcoin",
+      "keywords_zh": ["比特币", "BTC", "比特", "crypto货币", "加密币", "比特币行情", "BTC价格"],
+      "keywords_en": ["bitcoin", "BTC", "satoshi"],
+      "related_topics": ["crypto", "digital_asset"],
+      "primary_platforms": ["xueqiu", "weibo"],
+      "priority": "high"
+    },
+    "gold": {
+      "label": "黄金",
+      "label_en": "Gold",
+      "keywords_zh": ["黄金", "金价", "gold", "贵金属", "黄金ETF", "国际金价", "伦敦金"],
+      "keywords_en": ["gold", "XAU", "precious metal"],
+      "related_topics": ["commodities", "safe_haven"],
+      "primary_platforms": ["xueqiu", "wechat_oa"],
+      "priority": "high"
+    },
+    "us_stock": {
+      "label": "美股",
+      "label_en": "US Stock Market",
+      "keywords_zh": ["美股", "纳指", "纳斯达克", "标普", "道指", "美联储", "美股行情", "华尔街", "NYSE", "NASDAQ", "S&P"],
+      "keywords_en": ["US stock", "S&P500", "NASDAQ", "Dow Jones", "Wall Street"],
+      "related_topics": ["macro", "tech_stock", "investment_strategy"],
+      "primary_platforms": ["xueqiu", "wechat_oa", "toutiao"],
+      "priority": "high"
+    },
+    "a_stock": {
+      "label": "A股",
+      "label_en": "A-Share Market",
+      "keywords_zh": ["A股", "沪深", "上证", "深证", "A股行情", "股市", "大A", "沪指", "创业板", "科创板"],
+      "keywords_en": ["A-share", "Shanghai index", "Shenzhen"],
+      "related_topics": ["macro", "investment_strategy"],
+      "primary_platforms": ["xueqiu", "weibo"],
+      "priority": "high"
+    },
+    "ai": {
+      "label": "人工智能",
+      "label_en": "Artificial Intelligence",
+      "keywords_zh": ["AI", "人工智能", "大模型", "ChatGPT", "Claude", "GPT", "Gemini", "大语言模型", "LLM", "机器学习", "深度学习", "算法", "OpenAI", "Anthropic", "通义", "文心"],
+      "keywords_en": ["AI", "artificial intelligence", "LLM", "ChatGPT", "machine learning"],
+      "related_topics": ["tech_stock", "innovation"],
+      "primary_platforms": ["weibo", "bilibili", "toutiao"],
+      "priority": "high"
+    },
+    "trump": {
+      "label": "特朗普",
+      "label_en": "Trump",
+      "keywords_zh": ["特朗普", "川普", "Trump", "特朗普政策", "关税", "贸易战", "白宫"],
+      "keywords_en": ["Trump", "tariff", "trade war", "White House"],
+      "related_topics": ["macro", "us_stock", "geopolitics"],
+      "primary_platforms": ["weibo", "xueqiu", "wechat_oa"],
+      "priority": "high"
+    },
+    "macro": {
+      "label": "宏观经济",
+      "label_en": "Macroeconomics",
+      "keywords_zh": ["宏观", "经济", "通胀", "通货膨胀", "利率", "降息", "加息", "美联储", "央行", "GDP", "就业", "CPI", "PPI", "PMI", "经济数据"],
+      "keywords_en": ["macro", "inflation", "interest rate", "Federal Reserve", "GDP", "recession"],
+      "related_topics": ["us_stock", "a_stock", "gold"],
+      "primary_platforms": ["xueqiu", "wechat_oa", "toutiao"],
+      "priority": "medium"
+    },
+    "crypto": {
+      "label": "加密货币",
+      "label_en": "Cryptocurrency",
+      "keywords_zh": ["加密货币", "数字货币", "以太坊", "ETH", "币圈", "DeFi", "NFT", "Web3", "区块链", "altcoin"],
+      "keywords_en": ["crypto", "cryptocurrency", "Ethereum", "ETH", "DeFi", "NFT", "blockchain"],
+      "related_topics": ["bitcoin", "digital_asset"],
+      "primary_platforms": ["weibo", "xueqiu"],
+      "priority": "medium"
+    },
+    "real_estate": {
+      "label": "房产",
+      "label_en": "Real Estate",
+      "keywords_zh": ["房产", "房市", "楼市", "房价", "买房", "租房", "地产", "REITs", "商业地产"],
+      "keywords_en": ["real estate", "property", "housing", "REIT"],
+      "related_topics": ["macro", "investment_strategy"],
+      "primary_platforms": ["xueqiu", "wechat_oa"],
+      "priority": "medium"
+    },
+    "investment_strategy": {
+      "label": "投资策略",
+      "label_en": "Investment Strategy",
+      "keywords_zh": ["投资", "资产配置", "组合", "仓位", "止损", "定投", "价值投资", "成长投资", "策略", "投资逻辑", "择时", "轮动"],
+      "keywords_en": ["investment strategy", "portfolio", "asset allocation", "value investing"],
+      "related_topics": ["us_stock", "a_stock", "macro"],
+      "primary_platforms": ["xueqiu", "wechat_oa", "toutiao"],
+      "priority": "medium"
+    },
+    "tech_stock": {
+      "label": "科技股",
+      "label_en": "Tech Stocks",
+      "keywords_zh": ["科技股", "FAANG", "苹果", "特斯拉", "微软", "谷歌", "英伟达", "NVIDIA", "Meta", "亚马逊", "TSMC", "台积电"],
+      "keywords_en": ["tech stock", "FAANG", "Apple", "Tesla", "Microsoft", "Google", "NVIDIA", "Meta", "Amazon"],
+      "related_topics": ["us_stock", "ai"],
+      "primary_platforms": ["xueqiu", "weibo"],
+      "priority": "medium"
+    },
+    "finance": {
+      "label": "个人理财",
+      "label_en": "Personal Finance",
+      "keywords_zh": ["理财", "基金", "ETF", "债券", "储蓄", "复利", "收益", "年化", "保险"],
+      "keywords_en": ["personal finance", "mutual fund", "ETF", "bond", "savings", "compound interest"],
+      "related_topics": ["investment_strategy"],
+      "primary_platforms": ["wechat_oa", "toutiao", "xiaohongshu"],
+      "priority": "medium"
+    },
+    "commodities": {
+      "label": "大宗商品",
+      "label_en": "Commodities",
+      "keywords_zh": ["大宗商品", "原油", "石油", "铜", "铁矿石", "农产品", "CRB"],
+      "keywords_en": ["commodities", "crude oil", "copper", "agricultural"],
+      "related_topics": ["macro", "gold"],
+      "primary_platforms": ["xueqiu", "wechat_oa"],
+      "priority": "low"
+    },
+    "geopolitics": {
+      "label": "地缘政治",
+      "label_en": "Geopolitics",
+      "keywords_zh": ["地缘", "中美", "俄乌", "战争", "制裁", "国际局势", "外交"],
+      "keywords_en": ["geopolitics", "US-China", "Russia-Ukraine", "sanctions"],
+      "related_topics": ["macro", "gold", "commodities"],
+      "primary_platforms": ["weibo", "toutiao"],
+      "priority": "low"
+    }
+  },
+  "topic_priority_order": [
+    "bitcoin", "gold", "us_stock", "a_stock", "ai", "trump",
+    "macro", "crypto", "investment_strategy", "tech_stock",
+    "real_estate", "finance", "commodities", "geopolitics"
+  ],
+  "multi_topic_detection": "一条内容可同时属于多个主题，标注所有匹配的 topic_tags",
+  "fallback": "若无匹配主题，topic_tags 设为 []，不强行分类"
+}
